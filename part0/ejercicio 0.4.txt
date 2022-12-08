@@ -18,6 +18,6 @@ browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/data.json
 server-->browser: [{content: '', date: '2022-12-01T13:05:08.295Z'}, ...]
 
 browser executes the event handler
-that renders notes to display
+that renders notes to display.
 
 
