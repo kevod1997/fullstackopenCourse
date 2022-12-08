@@ -16,5 +16,5 @@ server-->browser: [{ content: "", date: "2022-12-01" }, ...]
 note over browser:
 browser executes the event handler
 that renders notes to display
-end note
+end note.
 

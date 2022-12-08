@@ -2,5 +2,5 @@ browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_sp
 server->browser: {content: "messi", date:" 2022-12-01T15: 15: 59.905Z "}
 
 browser executes the event handler and create a new note
-that renders the created note and add it to the notes
+that renders the created note and add it to the notes.
 
