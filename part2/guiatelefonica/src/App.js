@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Filter from "./Filter";
 import PersonForm from "./PersonForm";
 import Persons from "./Persons";
-import axios from "axios";
+import {getAll, create} from "./services/persons";
 
 function App() {
   const [persons, setPersons] = useState([]);
@@ -11,12 +11,17 @@ function App() {
   const [findName, setFindName] = useState("");
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons').then(response => {
+    getAll()
+    .then(initialPersons => {
         console.log('promise fulfilled')
-        setPersons(response.data)
+        console.log(initialPersons);
+        setPersons(initialPersons)
       })
   }, [])
+
+  
+
+
 
   const addPerson = (e) => {
     e.preventDefault();
@@ -27,7 +32,9 @@ function App() {
       setPersons(persons.concat(newPerson));
       setNewName("");
       setNewNumber("");
+      create(newPerson)
     }
+    
   };
 
   const handleFindName = (e) => {
