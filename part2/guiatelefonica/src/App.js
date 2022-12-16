@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Filter from "./Filter";
 import PersonForm from "./PersonForm";
 import Persons from "./Persons";
-import {getAll, create} from "./services/persons";
+import { getAll, create, deletePersons,updatePerson } from "./services/persons";
 
 function App() {
   const [persons, setPersons] = useState([]);
@@ -11,31 +11,59 @@ function App() {
   const [findName, setFindName] = useState("");
 
   useEffect(() => {
-    getAll()
-    .then(initialPersons => {
-        console.log('promise fulfilled')
-        console.log(initialPersons);
-        setPersons(initialPersons)
-      })
-  }, [])
+    getAll().then((initialPersons) => {
+      console.log("promise fulfilled");
+      console.log(initialPersons);
+      setPersons(initialPersons);
+    });
+  }, []);
 
-  
 
+  const deletePerson = (id) => {
+    deletePersons(id)
+    console.log('deleted');
+    setPersons(persons.filter((person) => person.id !== id));
+  };
 
 
   const addPerson = (e) => {
     e.preventDefault();
-    if (persons.some((person) => person.name === newName)) {
-      alert(`${newName} is already added to the phonebook`);
+    const existingPerson = persons.find((person) => person.name === newName);
+    if (existingPerson) {
+      if (existingPerson.number === newNumber) {
+        alert(`${newName} already has the number ${newNumber}`);
+        return;
+      }
+      if (window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one?`)) {
+        const updatedPerson = { ...existingPerson, number: newNumber };
+        updatePerson(existingPerson.id, updatedPerson)
+          .then((response) => {
+            console.log(response);
+            setPersons(persons.map((person) => person.id !== existingPerson.id ? person : updatedPerson));
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
     } else {
+      if(persons.some((person)=> person.number === newNumber)){
+        alert(`The number ${newNumber} already belongs to another person`);
+        return;
+      }
       const newPerson = { name: newName, number: newNumber };
-      setPersons(persons.concat(newPerson));
-      setNewName("");
-      setNewNumber("");
       create(newPerson)
+        .then((newPerson) => {
+          console.log(newPerson);
+          setPersons([...persons, newPerson]);
+          setNewName("");
+          setNewNumber("");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     }
-    
   };
+  
 
   const handleFindName = (e) => {
     setFindName(e.target.value);
@@ -69,7 +97,10 @@ function App() {
         </form>
 
         <h2>Numbers</h2>
-        <Persons filteredPersons={filteredPersons} />
+        <Persons
+          filteredPersons={filteredPersons}
+          deletePerson={deletePerson}
+        />
       </div>
     </>
   );
