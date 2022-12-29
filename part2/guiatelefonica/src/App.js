@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import ErrorNotification from "./ErrorNotification";
 import Filter from "./Filter";
+import Notification from "./Notification";
 import PersonForm from "./PersonForm";
 import Persons from "./Persons";
 import { getAll, create, deletePersons,updatePerson } from "./services/persons";
@@ -9,6 +11,8 @@ function App() {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [findName, setFindName] = useState("");
+  const [createMessage, setCreateMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     getAll().then((initialPersons) => {
@@ -40,9 +44,21 @@ function App() {
           .then((response) => {
             console.log(response);
             setPersons(persons.map((person) => person.id !== existingPerson.id ? person : updatedPerson));
+            setCreateMessage(
+              ` ${updatedPerson.name} number has changed`
+            )
+            setTimeout(() => {
+              setCreateMessage(null)
+            }, 5000)
           })
           .catch((error) => {
-            console.error(error);
+            console.log(error);
+            setErrorMessage(
+              `Information of ${updatedPerson.name} has alredy been removed from server`
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
           });
       }
     } else {
@@ -57,6 +73,12 @@ function App() {
           setPersons([...persons, newPerson]);
           setNewName("");
           setNewNumber("");
+          setCreateMessage(
+            `Added ${newPerson.name}`
+          )
+          setTimeout(() => {
+            setCreateMessage(null)
+          }, 5000)
         })
         .catch((error) => {
           console.error(error);
@@ -70,13 +92,16 @@ function App() {
   };
 
   const filteredPersons = persons.filter((person) =>
-    person.name.toLowerCase().includes(findName.toLowerCase())
-  );
+  person?.name.toLowerCase().includes(findName.toLowerCase())
+);
+
 
   return (
     <>
       <div>
         <h2>Phonebook</h2>
+        <Notification message={createMessage} />
+        <ErrorNotification errorMessage={errorMessage}/>
         <div>
           <Filter findName={findName} handleFindName={handleFindName} />
         </div>
